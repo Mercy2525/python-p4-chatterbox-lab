@@ -69,18 +69,18 @@ def messages_by_id(id):
         return response
     
     elif request.method=='PATCH':
-        for attr in request.form:
-            setattr(message,attr,request.form.get(attr))
+            # Update the message body
+        if 'body' in request.json:
+            message.body = request.json['body']  # Update the body attribute
 
-            db.session.add(message)
             db.session.commit()
 
-            msg_dict=message.to_dict()
-
-            response=make_response(jsonify(msg_dict),200)
-            
-            return response
-
+            msg_dict = message.to_dict()
+            response = make_response(jsonify(msg_dict), 200)
+            response.content_type = 'application/json'  # Set the content type to JSON
+            return response  # Return the response object
+        else:
+            return jsonify({"error": "Missing 'body' in the request data"}), 400
 
 
 if __name__ == '__main__':
